@@ -2,7 +2,7 @@ const { session } = require('electron').remote
 
 class Session {
   constructor(url = 'http://localhost') {
-    this.url = url
+    this.url = url;
   }
 
 	set({ name, value, funct }) {
@@ -17,9 +17,13 @@ class Session {
     })
   }
 
-  async get(name) {
-    const [ get_session_option ] = [{ url: this.url, name: name }]
+  get(name, funct) {
+    const [ get_session_option ] = [name ? { url: this.url, name: name } : {}]
 
-    return await session.defaultSession.cookies.get(get_session_option) 
+    session.defaultSession.cookies.get(get_session_option).then(cookie => {
+      let cookieValue = name ? cookie[0].value : cookie
+
+      typeof funct === 'function' ? funct(cookieValue) : undefined
+    });
   }
 }
